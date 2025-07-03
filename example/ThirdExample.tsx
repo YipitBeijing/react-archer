@@ -23,7 +23,18 @@ const ThirdExample = () => {
         margin: '50px',
       }}
     >
-      <ArcherContainer noCurves strokeColor="red">
+      <ArcherContainer
+        noCurves
+        strokeColor="red"
+        offset={3}
+        endShape={{
+          arrow: {
+            arrowLength: 4,
+            arrowThickness: 8,
+            noClosed: true,
+          },
+        }}
+      >
         <div style={rootStyle}>
           <ArcherElement
             id="root"

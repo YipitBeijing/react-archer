@@ -40,6 +40,7 @@ export type SourceToTargetType = {
 export type ArrowShapeType = {
   arrowLength?: number;
   arrowThickness?: number;
+  noClosed?: boolean;
 };
 
 export type CircleShapeType = {

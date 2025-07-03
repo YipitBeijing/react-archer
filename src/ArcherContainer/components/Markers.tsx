@@ -53,14 +53,35 @@ const arrowMarker = (style: LineType, endShape: ShapeType, strokeColor: string) 
     style.endShape?.arrow?.arrowThickness ||
     endShape?.arrow?.arrowThickness ||
     endShapeDefaultProp.arrow.arrowThickness;
-  const arrowPath = `M0,0 L0,${newArrowThickness} L${newArrowLength},${newArrowThickness / 2} z`;
+
+  const noClosed =
+    style.endShape?.arrow?.noClosed ??
+    endShape?.arrow?.noClosed ??
+    endShapeDefaultProp.arrow.noClosed;
+
+  let arrowPath = `M0,0 L0,${newArrowThickness} L${newArrowLength},${newArrowThickness / 2} z`;
+  if (noClosed) {
+    arrowPath = `M0,0 L${newArrowLength},${newArrowThickness / 2} L0,${newArrowThickness} `;
+  }
+  let path = <path d={arrowPath} fill={newStrokeColor} />;
+  if (noClosed) {
+    path = (
+      <path
+        d={arrowPath}
+        stroke={newStrokeColor}
+        fill={'none'}
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    );
+  }
 
   return {
     markerWidth: newArrowLength,
     markerHeight: newArrowThickness,
-    refX: 0,
+    refX: noClosed ? newArrowLength : 0,
     refY: newArrowThickness / 2,
-    path: <path d={arrowPath} fill={newStrokeColor} />,
+    path: path,
   };
 };
 
