@@ -1,5 +1,5 @@
 {
-  "name": "@edison/react-archer",
+  "name": "sh-react-archer",
   "description": "Draw arrows between DOM elements in React",
   "main": "lib/react-archer.js",
   "module": "lib/react-archer.js",
@@ -57,6 +57,7 @@
     "babel-loader": "8.0.6",
     "cross-env": "6.0.3",
     "css-loader": "3.2.0",
+    "csstype": "^3.1.3",
     "cypress": "10.11.0",
     "cypress-image-snapshot": "4.0.1",
     "eslint": "8.12.0",
@@ -85,7 +86,7 @@
     "style-loader": "1.0.0",
     "terser-webpack-plugin": "^2.1.2",
     "ts-loader": "8.2.0",
-    "typescript": "^4.6.3",
+    "typescript": "4.6.3",
     "webpack": "4.41.0",
     "webpack-cli": "3.3.9",
     "webpack-dev-server": "3.8.2",
