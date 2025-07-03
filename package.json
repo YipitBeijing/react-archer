@@ -16,7 +16,7 @@
     "url": "https://github.com/YipitBeijing/react-archer"
   },
   "bugs": {
-    "url": "https://github.com/pierpo/react-archer/issues"
+    "url": "https://github.com/YipitBeijing/react-archer/issues"
   },
   "scripts": {
     "build": "webpack --config webpack.prod.config.js",
