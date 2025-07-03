@@ -10,10 +10,10 @@
     "react-fast-compare": "^2.0.4",
     "resize-observer-polyfill": "1.5.0"
   },
-  "homepage": "https://github.com/pierpo/react-archer",
+  "homepage": "https://github.com/YipitBeijing/react-archer",
   "repository": {
     "type": "git",
-    "url": "https://github.com/pierpo/react-archer"
+    "url": "https://github.com/YipitBeijing/react-archer"
   },
   "bugs": {
     "url": "https://github.com/pierpo/react-archer/issues"

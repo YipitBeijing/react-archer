@@ -9,11 +9,12 @@
 `npm install react-archer --save` or `yarn add react-archer`
 
 ## React-Archer AI Bot
+
 [React-Archer](https://codeparrot.ai/oracle?owner=pierpo&repo=react-archer) Bot will help you understand this repository better. You can ask for code examples, installation guide, debugging help and much more.
 
 ## Example
 
-[Try it out!](https://pierpo.github.io/react-archer/)
+[Try it out!](https://github.com/YipitBeijing/react-archer/)
 
 ![Example](https://raw.githubusercontent.com/pierpo/react-archer/master/example.png)
 
