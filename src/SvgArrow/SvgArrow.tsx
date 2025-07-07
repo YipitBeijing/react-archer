@@ -1,7 +1,7 @@
 import React, { DOMAttributes } from 'react';
 import { Property } from 'csstype';
 import Vector2 from '../geometry/Vector2';
-import { AnchorPositionType, ValidLineStyles } from '../types';
+import { AnchorPositionType, ValidLineStyles, LineGroupType } from '../types';
 import { computeArrowDirectionVector } from './SvgArrow.helper';
 
 type Props = {
@@ -23,6 +23,8 @@ type Props = {
   domAttributes?: DOMAttributes<SVGElement>;
   hitSlop?: number;
   cursor?: Property.Cursor;
+  lineGroupType?: LineGroupType;
+  roundCorner?: number;
 };
 
 export function computeArrowPointAccordingToArrowHead(
@@ -48,6 +50,47 @@ export function computeArrowPointAccordingToArrowHead(
   return {
     xPoint,
     yPoint,
+  };
+}
+
+//Calculate the two points where the starting point is converted into a curve
+export function computeStartingCurvePosition(
+  xStart: number,
+  yStart: number,
+  xEnd: number,
+  yEnd: number,
+  roundCorner: number,
+  startingAnchorOrientation: AnchorPositionType,
+): {
+  xAnchor1_1: number;
+  yAnchor1_1: number;
+  xAnchor1_2: number;
+  yAnchor1_2: number;
+} {
+  let curvature = roundCorner;
+  if (startingAnchorOrientation === 'top' || startingAnchorOrientation === 'bottom') {
+    return {
+      xAnchor1_1: xStart,
+      yAnchor1_1: yStart + (yEnd - yStart) / 2 - Math.sign(yEnd - yStart) * curvature,
+      xAnchor1_2: xStart + Math.sign(xEnd - xStart) * curvature,
+      yAnchor1_2: yStart + (yEnd - yStart) / 2,
+    };
+  }
+
+  if (startingAnchorOrientation === 'left' || startingAnchorOrientation === 'right') {
+    return {
+      xAnchor1_1: xStart + (xEnd - xStart) / 2 - Math.sign(xEnd - xStart) * curvature,
+      yAnchor1_1: yStart,
+      xAnchor1_2: xStart + (xEnd - xStart) / 2,
+      yAnchor1_2: yStart + Math.sign(yEnd - yStart) * curvature,
+    };
+  }
+
+  return {
+    xAnchor1_1: xStart,
+    yAnchor1_1: yStart,
+    xAnchor1_2: xStart,
+    yAnchor1_2: yStart,
   };
 }
 
@@ -111,6 +154,47 @@ export function computeEndingAnchorPosition(
   };
 }
 
+//Calculate the two points of the curve converted from the end point
+export function computeEndingCurvePosition(
+  xStart: number,
+  yStart: number,
+  xEnd: number,
+  yEnd: number,
+  roundCorner: number,
+  endingAnchorOrientation: AnchorPositionType,
+): {
+  xAnchor2_1: number;
+  yAnchor2_1: number;
+  xAnchor2_2: number;
+  yAnchor2_2: number;
+} {
+  let curvature = roundCorner;
+  if (endingAnchorOrientation === 'top' || endingAnchorOrientation === 'bottom') {
+    return {
+      xAnchor2_1: xEnd - Math.sign(xEnd - xStart) * curvature,
+      yAnchor2_1: yEnd - (yEnd - yStart) / 2,
+      xAnchor2_2: xEnd,
+      yAnchor2_2: yEnd - (yEnd - yStart) / 2 + Math.sign(xEnd - xStart) * curvature,
+    };
+  }
+
+  if (endingAnchorOrientation === 'left' || endingAnchorOrientation === 'right') {
+    return {
+      xAnchor2_1: xEnd - (xEnd - xStart) / 2,
+      yAnchor2_1: yEnd - Math.sign(yEnd - yStart) * curvature,
+      xAnchor2_2: xEnd - (xEnd - xStart) / 2 + Math.sign(xEnd - xStart) * curvature,
+      yAnchor2_2: yEnd,
+    };
+  }
+
+  return {
+    xAnchor2_1: xEnd,
+    yAnchor2_1: yEnd,
+    xAnchor2_2: xEnd,
+    yAnchor2_2: yEnd,
+  };
+}
+
 export function computeLabelDimensions(
   xStart: number,
   yStart: number,
@@ -139,24 +223,47 @@ function computePathString({
   yStart,
   xAnchor1,
   yAnchor1,
+  xAnchor1_1,
+  yAnchor1_1,
+  xAnchor1_2,
+  yAnchor1_2,
   xAnchor2,
   yAnchor2,
+  xAnchor2_1,
+  yAnchor2_1,
+  xAnchor2_2,
+  yAnchor2_2,
   xEnd,
   yEnd,
   lineStyle,
   offset,
+  lineGroupType,
+  roundCorner,
 }: {
   xStart: number;
   yStart: number;
   xAnchor1: number;
   yAnchor1: number;
+  xAnchor1_1?: number;
+  yAnchor1_1?: number;
+  xAnchor1_2?: number;
+  yAnchor1_2?: number;
   xAnchor2: number;
   yAnchor2: number;
+  xAnchor2_1?: number;
+  yAnchor2_1?: number;
+  xAnchor2_2?: number;
+  yAnchor2_2?: number;
   xEnd: number;
   yEnd: number;
   lineStyle: string;
   offset?: number;
+  lineGroupType?: LineGroupType;
+  roundCorner?: number;
 }): string {
+  const oldYStart = yStart;
+  const oldYEnd = yEnd;
+
   if (offset && offset !== 0) {
     const angle =
       lineStyle === 'straight'
@@ -177,11 +284,39 @@ function computePathString({
   let linePath = `M${xStart},${yStart} `;
 
   if (['curve', 'angle'].includes(lineStyle)) {
-    linePath += `${
-      lineStyle === 'curve' ? 'C' : ''
-    }${xAnchor1},${yAnchor1} ${xAnchor2},${yAnchor2} `;
+    if (lineStyle === 'curve') {
+      linePath += `${
+        lineStyle === 'curve' ? 'C' : ''
+      }${xAnchor1},${yAnchor1} ${xAnchor2},${yAnchor2} `;
+    } else {
+      if (roundCorner) {
+        if (lineGroupType == LineGroupType.Up) {
+          if (yStart == yEnd) {
+            linePath += `${xAnchor1},${yAnchor1} ${xAnchor2},${yAnchor2} `;
+          } else if (yStart < yEnd) {
+            return '';
+          } else {
+            linePath += `${xAnchor1_1},${yAnchor1_1}  A5,5 0 0,0 ${xAnchor1_2},${yAnchor1_2} L${xAnchor2_1},${yAnchor2_1}  A5,5 0 0,1 ${xAnchor2_2},${yAnchor2_2} L`;
+          }
+        } else if (lineGroupType == LineGroupType.Down) {
+          if (oldYStart == oldYEnd) {
+            linePath += `${xAnchor1},${yAnchor1} ${xAnchor2},${yAnchor2} `;
+          } else if (oldYStart > oldYEnd) {
+            return '';
+          } else {
+            linePath += `${xAnchor1_1},${yAnchor1_1}  A5,5 0 0,1 ${xAnchor1_2},${yAnchor1_2}L${xAnchor2_1},${yAnchor2_1}  A5,5 0 0,0 ${xAnchor2_2},${yAnchor2_2} L`;
+          }
+        } else {
+          linePath += `${xAnchor1},${yAnchor1} ${xAnchor2},${yAnchor2} `;
+        }
+      } else {
+        linePath += `${xAnchor1},${yAnchor1} ${xAnchor2},${yAnchor2} `;
+      }
+    }
+    // linePath += `${
+    //   lineStyle === 'curve' ? 'C' : ''
+    // }${xAnchor1},${yAnchor1} ${xAnchor2},${yAnchor2} `;
   }
-
   linePath += `${xEnd},${yEnd}`;
   return linePath;
 }
@@ -205,6 +340,8 @@ const SvgArrow = ({
   domAttributes,
   hitSlop = 10,
   cursor = 'pointer',
+  lineGroupType,
+  roundCorner,
 }: Props) => {
   const actualArrowLength = endShape.circle
     ? endShape.circle.radius * 2
@@ -251,6 +388,39 @@ const SvgArrow = ({
     yEnd,
     endingAnchorOrientation,
   );
+  let anchorProps = {};
+  if (lineStyle == 'angle' && roundCorner) {
+    //Calculate the two points of the curve converted from the Starting position
+    const { xAnchor1_1, yAnchor1_1, xAnchor1_2, yAnchor1_2 } = computeStartingCurvePosition(
+      xStart,
+      yStart,
+      xEnd,
+      yEnd,
+      roundCorner,
+      startingAnchorOrientation,
+    );
+
+    // Calculate the two points of the curve converted from the Ending position
+    const { xAnchor2_1, yAnchor2_1, xAnchor2_2, yAnchor2_2 } = computeEndingCurvePosition(
+      xStart,
+      yStart,
+      xEnd,
+      yEnd,
+      roundCorner,
+      endingAnchorOrientation,
+    );
+
+    anchorProps = {
+      xAnchor1_1,
+      yAnchor1_1,
+      xAnchor1_2,
+      yAnchor1_2,
+      xAnchor2_1,
+      yAnchor2_1,
+      xAnchor2_2,
+      yAnchor2_2,
+    };
+  }
 
   const pathString = computePathString({
     xStart,
@@ -263,6 +433,9 @@ const SvgArrow = ({
     yEnd,
     lineStyle,
     offset,
+    lineGroupType,
+    roundCorner,
+    ...anchorProps,
   });
 
   const { xLabel, yLabel, labelWidth, labelHeight } = computeLabelDimensions(

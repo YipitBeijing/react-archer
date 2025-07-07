@@ -29,6 +29,7 @@ const ArcherContainer = React.forwardRef<ArcherContainerHandle, ArcherContainerP
       strokeWidth = 2,
       svgContainerStyle = {},
       noCurves,
+      roundCorner,
       children,
       className,
       endMarker,
@@ -159,6 +160,7 @@ const ArcherContainer = React.forwardRef<ArcherContainerHandle, ArcherContainerP
               strokeWidth={strokeWidth}
               strokeDasharray={strokeDasharray}
               noCurves={noCurves}
+              roundCorner={roundCorner}
               lineStyle={lineStyle}
               offset={offset}
               parentCurrent={parent.current}

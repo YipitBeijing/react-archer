@@ -67,3 +67,11 @@ export type LineType = {
 };
 
 export type ValidShapeTypes = 'arrow' | 'circle';
+
+export enum LineGroupType {
+  None = 'None',
+  Up = 'UP',
+  Down = 'Down',
+  Shrink = 'Shrink',
+  Expand = 'Expand',
+}

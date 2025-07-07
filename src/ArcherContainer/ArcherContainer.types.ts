@@ -62,6 +62,11 @@ export type ArcherContainerProps = {
    */
   noCurves?: boolean;
 
+  /**
+   *  Optional number for line  roundCorner when noCurves is true
+   */
+  roundCorner?: number;
+
   children?: React.ReactNode | FunctionChild;
 };
 
