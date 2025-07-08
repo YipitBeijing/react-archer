@@ -174,7 +174,7 @@ export function computeEndingCurvePosition(
       xAnchor2_1: xEnd - Math.sign(xEnd - xStart) * curvature,
       yAnchor2_1: yEnd - (yEnd - yStart) / 2,
       xAnchor2_2: xEnd,
-      yAnchor2_2: yEnd - (yEnd - yStart) / 2 + Math.sign(xEnd - xStart) * curvature,
+      yAnchor2_2: yEnd - (yEnd - yStart) / 2 - Math.sign(xEnd - xStart) * curvature,
     };
   }
 
@@ -296,7 +296,17 @@ function computePathString({
           } else if (yStart < yEnd) {
             return '';
           } else {
-            linePath += `${xAnchor1_1},${yAnchor1_1}  A5,5 0 0,0 ${xAnchor1_2},${yAnchor1_2} L${xAnchor2_1},${yAnchor2_1}  A5,5 0 0,1 ${xAnchor2_2},${yAnchor2_2} L`;
+            let toRight = true;
+            if (xStart < xEnd) {
+              toRight = true;
+            } else {
+              toRight = false;
+            }
+            linePath += `${xAnchor1_1},${yAnchor1_1}  A5,5 0 0,${
+              toRight ? 0 : 1
+            } ${xAnchor1_2},${yAnchor1_2} L${xAnchor2_1},${yAnchor2_1}  A5,5 0 0,${
+              toRight ? 1 : 0
+            } ${xAnchor2_2},${yAnchor2_2} L`;
           }
         } else if (lineGroupType == LineGroupType.Down) {
           if (oldYStart == oldYEnd) {
@@ -304,7 +314,17 @@ function computePathString({
           } else if (oldYStart > oldYEnd) {
             return '';
           } else {
-            linePath += `${xAnchor1_1},${yAnchor1_1}  A5,5 0 0,1 ${xAnchor1_2},${yAnchor1_2}L${xAnchor2_1},${yAnchor2_1}  A5,5 0 0,0 ${xAnchor2_2},${yAnchor2_2} L`;
+            let toRight = true;
+            if (xStart < xEnd) {
+              toRight = true;
+            } else {
+              toRight = false;
+            }
+            linePath += `${xAnchor1_1},${yAnchor1_1}  A5,5 0 0,${
+              toRight ? 1 : 0
+            } ${xAnchor1_2},${yAnchor1_2}L${xAnchor2_1},${yAnchor2_1}  A5,5 0 0,${
+              toRight ? 0 : 1
+            } ${xAnchor2_2},${yAnchor2_2} L`;
           }
         } else {
           linePath += `${xAnchor1},${yAnchor1} ${xAnchor2},${yAnchor2} `;
