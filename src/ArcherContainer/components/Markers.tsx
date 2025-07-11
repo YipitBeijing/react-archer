@@ -77,7 +77,7 @@ const arrowMarker = (style: LineType, endShape: ShapeType, strokeColor: string) 
   }
 
   return {
-    markerWidth: newArrowLength,
+    markerWidth: newArrowLength + 1, // 1 is  adjust stroke-linejoin,
     markerHeight: newArrowThickness,
     refX: noClosed ? newArrowLength : 0,
     refY: newArrowThickness / 2,

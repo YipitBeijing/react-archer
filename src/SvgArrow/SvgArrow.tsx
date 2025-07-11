@@ -36,6 +36,7 @@ export function computeArrowPointAccordingToArrowHead(
   lineStyle?: ValidLineStyles,
   xArrowStart?: number,
   yArrowStart?: number,
+  endShape?: Record<string, any>,
 ) {
   let { arrowX, arrowY } = computeArrowDirectionVector(endingAnchorOrientation);
 
@@ -44,8 +45,14 @@ export function computeArrowPointAccordingToArrowHead(
     arrowX = Math.cos(angle);
     arrowY = Math.sin(angle);
   }
+  let moveXLength = (arrowX * arrowLength * strokeWidth) / 2;
 
-  const xPoint = xArrowHeadPoint + (arrowX * arrowLength * strokeWidth) / 2;
+  const noClosed = !!endShape?.arrow?.noClosed;
+  if (noClosed && arrowX == -1) {
+    moveXLength = 0;
+  }
+
+  const xPoint = xArrowHeadPoint + moveXLength;
   const yPoint = yArrowHeadPoint + (arrowY * arrowLength * strokeWidth) / 2;
   return {
     xPoint,
@@ -389,6 +396,7 @@ const SvgArrow = ({
     lineStyle,
     startingPoint.x,
     startingPoint.y,
+    endShape,
   );
 
   // Starting position
